@@ -21,7 +21,7 @@ impl fmt::Debug for State {
     }
 }
 
-#[derive(PartialEq, Hash, Eq, Copy, Clone)]
+#[derive(PartialOrd, Ord, PartialEq, Eq, Copy, Clone)]
 pub enum BranchLabel<T> {
     Literal(T),
     Empty,

@@ -1,7 +1,7 @@
 extern crate dfa_generator;
 use dfa_generator::regex::*;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(PartialOrd, Ord, PartialEq, Eq, Clone, Debug)]
 enum Step {
     A,
     B,

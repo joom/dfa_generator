@@ -2,15 +2,14 @@ use crate::re_to_nfa::{BranchLabel, State, NFA};
 use petgraph::graph::Graph;
 use petgraph::graph::NodeIndex;
 use std::cmp::Eq;
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 use std::collections::VecDeque;
-use std::hash::Hash;
 
 pub struct DFA<T> {
     pub graph: Graph<State, BranchLabel<T>>,
 }
 
-impl<T: Hash + Eq + Clone> NFA<T> {
+impl<T: Ord + Eq + Clone> NFA<T> {
     pub fn to_dfa(&self) -> DFA<T> {
         DFA {
             graph: converter(self.graph.clone()),
@@ -18,7 +17,7 @@ impl<T: Hash + Eq + Clone> NFA<T> {
     }
 }
 
-pub fn converter<T: Hash + Eq + Clone>(
+pub fn converter<T: Ord + Eq + Clone>(
     nfa: Graph<State, BranchLabel<T>>,
 ) -> Graph<State, BranchLabel<T>> {
     let mut start = None;
@@ -41,7 +40,7 @@ pub fn converter<T: Hash + Eq + Clone>(
     let mut nodes = vec![start_node];
     while !queue.is_empty() {
         let indices = queue.pop_front().unwrap();
-        let mut alphabet = HashSet::new();
+        let mut alphabet = BTreeSet::new();
         let node_index = sets.iter().position(|x| *x == indices).unwrap();
         let current_node = nodes[node_index];
         for index in &indices {
@@ -53,7 +52,7 @@ pub fn converter<T: Hash + Eq + Clone>(
         }
 
         for symbol in alphabet {
-            let mut set = HashSet::new();
+            let mut set = BTreeSet::new();
             for &index in &indices {
                 for neighbor in nfa.neighbors(index.clone()) {
                     for edge in nfa.edges_connecting(index, neighbor) {
@@ -90,10 +89,10 @@ pub fn converter<T: Hash + Eq + Clone>(
 }
 pub fn closure<T: Eq>(
     graph: &Graph<State, BranchLabel<T>>,
-    indices: HashSet<NodeIndex>,
+    indices: BTreeSet<NodeIndex>,
     label: BranchLabel<T>,
-) -> HashSet<NodeIndex> {
-    let mut set = HashSet::new();
+) -> BTreeSet<NodeIndex> {
+    let mut set = BTreeSet::new();
     if label == BranchLabel::Empty {
         for index in indices.clone() {
             set.insert(index);
@@ -101,7 +100,7 @@ pub fn closure<T: Eq>(
     }
     let mut indices = indices;
     while !indices.is_empty() {
-        let mut next_indices = HashSet::new();
+        let mut next_indices = BTreeSet::new();
         for &index in &indices {
             for node in graph.neighbors(index) {
                 for edge in graph.edges_connecting(index, node) {
