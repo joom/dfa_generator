@@ -23,7 +23,7 @@ pub fn converter<T: Hash + Eq + Clone>(
 ) -> Graph<State, BranchLabel<T>> {
     let mut start = None;
     for node in nfa.node_indices() {
-        if *(nfa.node_weight(node).unwrap()) == State::Start {
+        if *(nfa.node_weight(node).unwrap()) == State::Initial {
             start = Some(node);
         }
     }
@@ -36,7 +36,7 @@ pub fn converter<T: Hash + Eq + Clone>(
     queue.push_back(start_set.clone());
 
     let mut dfa = Graph::<State, BranchLabel<T>>::new();
-    let start_node = dfa.add_node(State::Start);
+    let start_node = dfa.add_node(State::Initial);
     let mut sets = vec![start_set];
     let mut nodes = vec![start_node];
     while !queue.is_empty() {

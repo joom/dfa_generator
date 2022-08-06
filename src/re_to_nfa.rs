@@ -6,7 +6,7 @@ use std::fmt;
 
 #[derive(PartialEq, Clone)]
 pub enum State {
-    Start,
+    Initial,
     Standard,
     Final,
 }
@@ -14,7 +14,7 @@ pub enum State {
 impl fmt::Debug for State {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            State::Start => f.write_fmt(format_args!("Start")),
+            State::Initial => f.write_fmt(format_args!("Initial")),
             State::Standard => f.write_fmt(format_args!("")),
             State::Final => f.write_fmt(format_args!("Final")),
         }
@@ -50,7 +50,7 @@ impl<T: Clone> Regex<T> {
 
 pub fn converter<T>(expression: Regex<T>) -> Graph<State, BranchLabel<T>> {
     let mut graph = Graph::<State, BranchLabel<T>>::new();
-    let start = graph.add_node(State::Start);
+    let start = graph.add_node(State::Initial);
     let end = generate(&mut graph, start, expression);
     *(graph.node_weight_mut(end).unwrap()) = State::Final;
     return graph;
