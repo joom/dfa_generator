@@ -4,7 +4,7 @@ use petgraph::graph::Graph;
 use petgraph::graph::NodeIndex;
 use std::fmt;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum State {
     Start,
     Standard,
@@ -32,6 +32,18 @@ impl<T: fmt::Debug> fmt::Debug for BranchLabel<T> {
         match self {
             BranchLabel::Literal(c) => f.write_fmt(format_args!("{:?}", c)),
             BranchLabel::Empty => f.write_fmt(format_args!("ε")),
+        }
+    }
+}
+
+pub struct NFA<T> {
+    pub graph: Graph<State, BranchLabel<T>>,
+}
+
+impl<T: Clone> Regex<T> {
+    pub fn to_nfa(&self) -> NFA<T> {
+        NFA {
+            graph: converter(self.clone()),
         }
     }
 }

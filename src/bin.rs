@@ -1,7 +1,5 @@
 extern crate dfa_generator;
 use dfa_generator::regex::*;
-use dfa_generator::re_to_nfa;
-use dfa_generator::nfa_to_dfa;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 enum Step {
@@ -18,7 +16,6 @@ pub fn main() {
     let d = Regex::Literal(Step::D);
     let b_or_c = b.alternate(&c);
     let rgx = a.concatenate(&b_or_c).concatenate(&d);
-    let nfa = re_to_nfa::converter(rgx);
-    let dfa = nfa_to_dfa::converter(nfa);
-    println!("{:?}", dfa);
+    let dfa = rgx.to_nfa().to_dfa();
+    println!("{:?}", dfa.graph);
 }

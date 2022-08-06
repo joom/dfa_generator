@@ -1,10 +1,22 @@
-use crate::re_to_nfa::{BranchLabel, State};
+use crate::re_to_nfa::{BranchLabel, State, NFA};
 use petgraph::graph::Graph;
 use petgraph::graph::NodeIndex;
+use std::cmp::Eq;
 use std::collections::HashSet;
 use std::collections::VecDeque;
-use std::cmp::Eq;
 use std::hash::Hash;
+
+pub struct DFA<T> {
+    pub graph: Graph<State, BranchLabel<T>>,
+}
+
+impl<T: Hash + Eq + Clone> NFA<T> {
+    pub fn to_dfa(&self) -> DFA<T> {
+        DFA {
+            graph: converter(self.graph.clone()),
+        }
+    }
+}
 
 pub fn converter<T: Hash + Eq + Clone>(
     nfa: Graph<State, BranchLabel<T>>,
