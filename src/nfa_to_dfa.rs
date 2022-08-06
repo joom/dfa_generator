@@ -3,7 +3,12 @@ use petgraph::graph::Graph;
 use petgraph::graph::NodeIndex;
 use std::collections::HashSet;
 use std::collections::VecDeque;
-pub fn converter(nfa: Graph<State, BranchLabel>) -> Graph<State, BranchLabel> {
+use std::cmp::Eq;
+use std::hash::Hash;
+
+pub fn converter<T: Hash + Eq + Clone>(
+    nfa: Graph<State, BranchLabel<T>>,
+) -> Graph<State, BranchLabel<T>> {
     let mut start = None;
     for node in nfa.node_indices() {
         if *(nfa.node_weight(node).unwrap()) == State::Start {
@@ -18,11 +23,11 @@ pub fn converter(nfa: Graph<State, BranchLabel>) -> Graph<State, BranchLabel> {
     let mut queue = VecDeque::new();
     queue.push_back(start_set.clone());
 
-    let mut dfa = Graph::<State, BranchLabel>::new();
+    let mut dfa = Graph::<State, BranchLabel<T>>::new();
     let start_node = dfa.add_node(State::Start);
     let mut sets = vec![start_set];
     let mut nodes = vec![start_node];
-    while !queue.is_empty(){
+    while !queue.is_empty() {
         let indices = queue.pop_front().unwrap();
         let mut alphabet = HashSet::new();
         let node_index = sets.iter().position(|x| *x == indices).unwrap();
@@ -35,12 +40,12 @@ pub fn converter(nfa: Graph<State, BranchLabel>) -> Graph<State, BranchLabel> {
             }
         }
 
-        for character in alphabet {
+        for symbol in alphabet {
             let mut set = HashSet::new();
             for &index in &indices {
                 for neighbor in nfa.neighbors(index.clone()) {
                     for edge in nfa.edges_connecting(index, neighbor) {
-                        if edge.weight() == character {
+                        if edge.weight() == symbol {
                             set.insert(neighbor);
                         }
                     }
@@ -50,7 +55,8 @@ pub fn converter(nfa: Graph<State, BranchLabel>) -> Graph<State, BranchLabel> {
             if sets.contains(&set) {
                 let index = sets.iter().position(|x| *x == set).unwrap();
                 let node = nodes[index];
-                let edge = dfa.add_edge(current_node, node, *character);
+                let label = symbol.clone();
+                let edge = dfa.add_edge(current_node, node, label);
             } else {
                 let mut state = State::Standard;
                 for &node in &set {
@@ -63,16 +69,17 @@ pub fn converter(nfa: Graph<State, BranchLabel>) -> Graph<State, BranchLabel> {
 
                 let node = dfa.add_node(state);
                 nodes.push(node);
-                let edge = dfa.add_edge(current_node, node, *character);
+                let label = symbol.clone();
+                let edge = dfa.add_edge(current_node, node, label);
             }
         }
     }
     return dfa;
 }
-pub fn closure(
-    graph: &Graph<State, BranchLabel>,
+pub fn closure<T: Eq>(
+    graph: &Graph<State, BranchLabel<T>>,
     indices: HashSet<NodeIndex>,
-    label: BranchLabel,
+    label: BranchLabel<T>,
 ) -> HashSet<NodeIndex> {
     let mut set = HashSet::new();
     if label == BranchLabel::Empty {

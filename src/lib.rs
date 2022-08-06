@@ -4,5 +4,4 @@
 
 mod nfa_to_dfa;
 mod re_to_nfa;
-mod regular_expression;
-mod tests;
+mod regex;
