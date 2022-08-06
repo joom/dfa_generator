@@ -8,7 +8,7 @@ use std::fmt;
 pub enum State {
     Start,
     Standard,
-    End(&'static str),
+    Final,
 }
 
 impl fmt::Debug for State {
@@ -16,10 +16,11 @@ impl fmt::Debug for State {
         match self {
             State::Start => f.write_fmt(format_args!("Start")),
             State::Standard => f.write_fmt(format_args!("")),
-            State::End(s) => f.write_fmt(format_args!("End({})", s)),
+            State::Final => f.write_fmt(format_args!("Final")),
         }
     }
 }
+
 #[derive(PartialEq, Hash, Eq, Copy, Clone)]
 pub enum BranchLabel<T> {
     Literal(T),
@@ -39,7 +40,7 @@ pub fn converter<T>(expression: Regex<T>) -> Graph<State, BranchLabel<T>> {
     let mut graph = Graph::<State, BranchLabel<T>>::new();
     let start = graph.add_node(State::Start);
     let end = generate(&mut graph, start, expression);
-    *(graph.node_weight_mut(end).unwrap()) = State::End("Hello");
+    *(graph.node_weight_mut(end).unwrap()) = State::Final;
     return graph;
 }
 

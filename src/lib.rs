@@ -2,6 +2,6 @@
 #![allow(unused_variables)]
 #![allow(clippy::needless_return)]
 
-mod nfa_to_dfa;
-mod re_to_nfa;
-mod regex;
+pub mod nfa_to_dfa;
+pub mod re_to_nfa;
+pub mod regex;

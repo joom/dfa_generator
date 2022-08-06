@@ -60,8 +60,8 @@ pub fn converter<T: Hash + Eq + Clone>(
             } else {
                 let mut state = State::Standard;
                 for &node in &set {
-                    if let State::End(s) = *nfa.node_weight(node).unwrap() {
-                        state = State::End(s);
+                    if let State::Final = *nfa.node_weight(node).unwrap() {
+                        state = State::Final;
                     }
                 }
                 sets.push(set.clone());

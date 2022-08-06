@@ -19,7 +19,7 @@ impl<T: Clone> Regex<T> {
             Regex::Star(_) => 3,
         }
     }
-    pub fn kleene_star(&self) -> Self {
+    pub fn star(&self) -> Self {
         return Regex::Star(Box::new(self.clone()));
     }
     pub fn concatenate(&self, other: &Self) -> Self {
